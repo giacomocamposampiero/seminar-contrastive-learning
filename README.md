@@ -6,7 +6,7 @@
 |:-------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
 | [Introduction](#introduction)                                                         | Learning approaches (supervised, unsupervised, self-supervised), definition of Contrastive Learning, general intuition and motivation |
 | [Application examples in CV](#contrastive-learning-in-computer-vision)                | CL in practice: a brief introduction of  CL in Computer Vision and an overview over a influential application (SimCLR)                |
-| [Theoretical understanding of CL](#theoretical-understanding-of-contrastive-learning) | Explaining CL: InfoMax principle, Alignment and Uniformity                                                                            |
+| [Theoretical understanding of CL](#theoretical-understanding-of-contrastive-learning) | Explaining CL: InfoMax principle, Alignment and Uniformity, Anisotropy                                                                |
 | [Contrastive Learning in NLP](#contrastive-learning-in-nlp)                           | Brief contextualization of Contrastive Learning in Natural Language Processing, overview of two applications (SimCSE and DPR)         |
 
 ## Introduction
@@ -201,7 +201,7 @@ In the context of Natural Language Processing, one of the two properties identif
 
 Anisotropy is an issue that was found in representations produced by huge pre-trained language models such as BERT and RoBERTa in some recent works (Ethayarajh 2019; Li et al. 2020). The problem with these embeddings is that they lay in a narrow cone of the vector space, while most of it remains virtually empty (image from Luo 2021).
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/anisotropy.png" alt="" width="342" data-align="center">
+<img title="" src="media/anisotropy.png" alt="" width="342" data-align="center">
 
 Wang et al. 2020 further show in their work that this problem is related to the drastic decay on the singular values of word embedding matrices in language models.
 
@@ -306,7 +306,37 @@ As final remark, a cool demo of SimCSE can be found on their Github repo, and a 
 
 <img title="" src="media/demo.gif" alt="" width="496" data-align="center">
 
+### DPR
 
+The last application that we want to cover is Dense Passage Retriever (DPR) presented in 2020 by Karpukhin et al. A passage retriever is one of the two fundament pieces that compose an open-domain Question Answering (QA) system. 
+
+Open-domain question answering (QA) is a task that answers factoid questions using knowledge learnt from a large collection of documents. It is composed of two main components: a **retriever**, whose goal is to select the most relevent passages from the collection of available documents, and a **reader**, whose aim to carefully analyze each retrieved passage to find and output the answer to the question. The retriever could be see as a trimmer of the document collections, that outputs just a small portion of the initial text that contains relevant content in the context of the question that is then carefully parsed by the reader.
+
+The collection of document is initially splitted over many passages of constant length, and these passages are usually encoded using embedding methods such as TF-IDF and BM25. Another (complementary) possibility to encode passages is using dense, latent semantic vectors. However these methods usually require a large number of labeled pairs of questions and contexts, and for this reason dense retrievers never outperformed TF-IDF/BM25 methods in practice. At least before DPR.
+
+DPR is in fact a dense passage retriever trained using a contrastive objective, where positive pairs are no longer augmented versions of the same sample, but $(question, answer)$ pairs. The loss is a tipical contrastive loss, defined as
+
+$$
+\mathcal{L}(q_i, p_i^+, p_{i,1}^-, \dots, p_{i,n}^-) = -\,\log \, \frac{\exp(\text{sim}\left( q_i, p_i^+ \right))}{\exp(\text{sim}\left( q_i, p_i^+ \right)) + \sum_{j=1}^n \exp \left( \text{sim}\left( q_i, p_{i,j}^- \right) \right)}
+$$
+
+In this case, the embeddings for passages and answers are obtained using two different encoders (that in the experiments performed by the authors are just BERT models), and in particular (as for SimCSE) the embedding is BERT [CLS] token. 
+
+The definition of negative samples is a little bit trickier. The authors in fact experiment different options in their work:
+
+- *standard 1-N training set*, that is each sample in the mini-batch is attached other N negative samples randomly sampled from the whole passage collection
+
+- *in-batch negative sampling*, that is the N negative samples are randomly sampled from the mini-batch passages (memory efficient, allows more negative samples)
+
+- *in-batch negative sampling + additional hard negative for BM25*, that is equal to the latter but one more negative sample is added, that correspond to the passage which is not the right answer associated by BM25 with the highest score (intuitively, we're adding a negative sample which is really close to the real answer but it's not a valid answer)
+
+DPR outperform state-of-the-art BM25 on both top-*k* accuracy (intrinsic evaluation) and leads to improvements for the downstream task of end-to-end exact match (extrinsic evaluation) on 4 out of 5 chosen training sets.
+
+Also, it’s worth to mention that with the help of FAISS in-memory index DPR can be made incredibly efficient during inference time, more than 4 times faster than BM25. However, sparse representations such that BM25 are way less time expensive to train w.r.t. dense representations.
+
+### Outro
+
+And with this, our journey through Contrastive Learning has come to an end. I hope you enjoyed the content so far and, if you're curious about the topic, below you can find my references that are comprehensive of all the material I consulted to write down this presentation. Thanks again for making it to the end :)
 
 ## References
 
