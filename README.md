@@ -2,12 +2,12 @@
 
 ## Structure of the presentation
 
-| **Section**                     | **Topics**                                                                     |
-|:-------------------------------:| ------------------------------------------------------------------------------ |
-| Introduction                    | Motivation, definition of Contrastive Learning and general intuition           |
-| Application examples in CV      | Brief presentation of some recent applications in Computer Vision SimCLR       |
-| Theoretical understanding of CL | Alignment and Uniformity from (Wang et Isola)                                  |
-| Applications in NLP             | Brief contextualization of Contrastive Learning in Natural Language Processing |
+| **Section**                                                                           | **Topics**                                                                                                                            |
+|:-------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
+| [Introduction](#introduction)                                                         | Learning approaches (supervised, unsupervised, self-supervised), definition of Contrastive Learning, general intuition and motivation |
+| [Application examples in CV](#contrastive-learning-in-computer-vision)                | CL in practice: a brief introduction of  CL in Computer Vision and an overview over a influential application (SimCLR)                |
+| [Theoretical understanding of CL](#theoretical-understanding-of-contrastive-learning) | Explaining CL: InfoMax principle and Alignment and Uniformity                                                                         |
+| Applications in NLP                                                                   | Brief contextualization of Contrastive Learning in Natural Language Processing, overview of two applications (SimCSE and DPR)         |
 
 ## Introduction
 
@@ -162,12 +162,6 @@ $$
 Uniformity in the hypersphere is rather difficult to visualize, but we can try using an illustration inspired from (Wang and Isola, 2020). 
 
 <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/unifor.png" alt="" width="296" data-align="center">
-
-
-
-
-
-
 
 ## References
 
