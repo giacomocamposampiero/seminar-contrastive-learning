@@ -312,6 +312,8 @@ The last application that we want to cover is Dense Passage Retriever (DPR) pres
 
 Open-domain question answering (QA) is a task that answers factoid questions using knowledge learnt from a large collection of documents. It is composed of two main components: a **retriever**, whose goal is to select the most relevent passages from the collection of available documents, and a **reader**, whose aim to carefully analyze each retrieved passage to find and output the answer to the question. The retriever could be see as a trimmer of the document collections, that outputs just a small portion of the initial text that contains relevant content in the context of the question that is then carefully parsed by the reader.
 
+<img title="" src="media/dprstrut.png" alt="" width="534" data-align="center">
+
 The collection of document is initially splitted over many passages of constant length, and these passages are usually encoded using embedding methods such as TF-IDF and BM25. Another (complementary) possibility to encode passages is using dense, latent semantic vectors. However these methods usually require a large number of labeled pairs of questions and contexts, and for this reason dense retrievers never outperformed TF-IDF/BM25 methods in practice. At least before DPR.
 
 DPR is in fact a dense passage retriever trained using a contrastive objective, where positive pairs are no longer augmented versions of the same sample, but $(question, answer)$ pairs. The loss is a tipical contrastive loss, defined as
