@@ -11,7 +11,7 @@
 
 ## Introduction
 
-#### Supervised and Unsupervised Learning
+### Supervised and Unsupervised Learning
 
 As you might already know, machine learning approaches are traditionally divided in two main categories: **supervised** and **unsupervised** **learning** (for simplicity we're not considering other important frameworks such that reinforcement learning and semi-supervised learning, which are less relevant in this context). 
 
@@ -25,7 +25,7 @@ The main advantage of supervised approaches is that can be very effective with t
 
 However, there exists a middleground between the two, that combines the advanteges of the approaches presented so far: self-supervised learning. 
 
-#### Self-supervised Learning
+### Self-supervised Learning
 
 **Self-supervised learning** is a particular approach that allows to exploit "natural" labels that come for free with data in certain contexts, without the need of any external annotator, to learn representations for the samples. 
 
@@ -33,7 +33,7 @@ In self-supervised the model is trained on an unlabeled dataset (usually large) 
 
 <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/bert.png" alt="" width="467" data-align="center">
 
-#### Contrastive Learning
+### Contrastive Learning
 
 **Contrastive Learning** is one of the most popular and powerful approaches used within the self-supervised framework. Being a self-supervised approach, its primarly goal is to learn meaningful representations leveraging huge datasets and a supervised training objective. 
 
@@ -47,7 +47,7 @@ The intuition behind this objective is that we want our encoder to learn to extr
 
 But does this very intuitive framework work in practice? Well, it seems so! Below for example are shown the accuracies achieved in the ImageNet Linear Benchmark in the last few years (accuracy on a classification downstream task; the task consists of training a self-supervised learning to extract image embeddings, then freezing the embeddings and adding a linear classifier on top of them, and finally measure the accuracy of the method). The picture clearly show how the advent of contrastive learning approces translated in a huge increase of performances in this task.
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/best.png" alt="" width="451" data-align="center">
+<img title="" src="media/best.png" alt="" width="451" data-align="center">
 
 ## Contrastive Learning in Computer Vision
 
@@ -67,7 +67,7 @@ Even if the first contribution to contrastive learning has now more than thirty 
 
 - Barlow Twins (Zbontar et al. 2021)
 
-#### SimCLR
+### SimCLR
 
 SimCLR is a simple framework for contrastive learning of visual representations. It was proposed by Chen et al. in 2020 and it's one of the most influential works in the contexts of contrastive learning in Computer Vision. 
 
@@ -75,7 +75,7 @@ The core idea behind SimCLR is rather easy: use parallel stochastic augmentation
 
 A visual representation of the pipeline is shown below. Note that the similarity between positive pairs is not computed directly on the latent-space embeddings *h*, but rather on a non-linear projection *z* which is obtained passing the latent embeddings through a 1 hidden layer perceptron. The authors in fact show in their paper that this improve the quality of the representations in downstream tasks before the projection layer *g( )*, and they conjecture that this is due to the excessive loss of information induced by the contrastive loss (e.g. in some tasks informations about the color might be useful). The non-linear projection on the other hand can learn to be invariant to this kind of information, allowing to preserve them in the previous layer.
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/simclr.png" alt="" data-align="center" width="553">
+<img title="" src="media/simclr.png" alt="" data-align="center" width="553">
 
 The training of this models is articulated in 4 different steps.
 
@@ -101,7 +101,7 @@ The authors investigate in their work many aspects related to the proposed model
 
 These findings are rather interesting, as they allow us to identify in negative samples and powerful data augmentation one of the reasons why the framework works so well in practice and does not overfit the data also if trained for longer compared to supervised approaches.
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/machine_learning_2x.png" alt="" width="275" data-align="center">
+<img title="" src="media/machine_learning_2x.png" alt="" width="275" data-align="center">
 
 ## Theoretical Understanding of Contrastive Learning
 
@@ -123,7 +123,7 @@ $$
 \mathcal{L}_{contrastive}\,(f; \tau, M) = \underset{\substack{(x,y)\sim p_{pos}\\ \{x_i^- \}_{i=1}^M \stackrel{\text{i.i.d.}}{\sim} p_{data}}}{\mathbb{E}} \left[ -\, \log\, \frac{\exp\left(f(x)^\intercal f(y)/\tau\right)}{\exp\left(f(x)^\intercal f(y)/\tau\right) + \sum_i \exp \left( \,f(x_i^-)^\intercal f(y)/\tau \right) }\right]
 $$
 
-#### InfoMax principle
+### InfoMax principle
 
 Many initial works on contrastive learning were motivated by the so called **InfoMax principle**, that is the maximization of the mutual information between the embeddings of positive pairs $I(f(x);f(y))$. In this setting, the contrastive loss is usually seen as a lower bound on the mutual information.
 
@@ -135,7 +135,7 @@ $$
 
 However, this bound, as well as the InfoMax interpretation in general, has been proved to be quite weak, both from a theoretical (McAllester & Statos 2020, which in their work showed formal limitations on the measurement of mutual information) and empirical (Tschannen et al. 2019, which showed that optimizing a tighter bound on mutual information can lead to worse representations) perspective.
 
-#### Alignment and Uniformity
+### Alignment and Uniformity
 
 A more recent work from Tongzhou Wang and Phillip Isola backed contrastive learning with new theoretical insights. In their work, the two authors started from the empirical observation that latent embeddings produced by normalized contrastive losses live in the unit sphere and from there identified two novel properties, **alignment** and **uniformity**.
 
@@ -147,7 +147,7 @@ $$
 
 Referring to the initial graphic about embeddings in the latent space, the alignment property quantify "how close are pulled embeddings of similar representations in average".
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/alignment.png" alt="" width="412" data-align="center">
+<img title="" src="media/alignment.png" alt="" width="412" data-align="center">
 
 Uniformity, on the other hand, measures how uniformly distributed are the feature vectors in the latent space. We want features to be uniformly distributed to preserve as much information of the data as possible. 
 
@@ -159,7 +159,7 @@ $$
 
 Uniformity in the hypersphere is rather difficult to visualize, but we can try using an illustration inspired from (Wang and Isola, 2020). 
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/unifor.png" alt="" width="296" data-align="center">
+<img title="" src="media/unifor.png" alt="" width="296" data-align="center">
 
 Finally, the authors analyzed the behavior of the contrastive loss in light of the two properties defined above. The result of this analysis are formalized in Theorem 1, where they present the asyntotic behavior of the (normalized) contrastive loss for negative samples which tend to infinite. They show that the loss converges to
 
@@ -183,13 +183,13 @@ Hence, the contrastive loss clearly optimizes both alignment and uniformity.
 
 In their work, the authors also investigate alignment and uniformity properties empirically to verify their claims. The most notable results that they obtain are
 
-1. alignment and uniformity loss strongly agree with downstream performances, that is more aligned and uniform embeddings achieve better results in downstream tasks, as shown in the illustrations from Wang and Isola<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/downstream.png" alt="" width="528" data-align="center">
+1. alignment and uniformity loss strongly agree with downstream performances, that is more aligned and uniform embeddings achieve better results in downstream tasks, as shown in the illustrations from Wang and Isola<img title="" src="media/downstream.png" alt="loading-ag-817" width="528" data-align="center">
 
 2. alignment and uniformity are meaningful across many different representation learning variants (they experimented with images and text)
 
 3. both alignment and uniformity are necessary for good representations; they prove this by defining a new loss as the weighted average between alignement and uniformity losses, and then varying the weight parameter. The result is an U-shaped validation accuracy curved, meaning that the sweet spot is somewhere in the middle, where they are both weighted almost equally 
    
-   <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/ushape.png" alt="" width="410" data-align="center">
+   <img title="" src="media/ushape.png" alt="" width="410" data-align="center">
 
 4. directly optimizing alignment and uniformity losses at the same time can lead to better results w.r.t. contrastive loss for limited number of negative samples
 
@@ -197,7 +197,46 @@ In general, the results presented in this section are just a gist of the work th
 
 ## Contrastive Learning in NLP
 
-In Natural Language Processing 
+Now that you're more or less familiar (I hope) with contrastive learning, we're ready to tackle the main topic of today's talk: contrastive learnign for Natural Language Processing. 
+
+In Natural Language Processing, self-supervised learning approches have been around for a while. For example, language models have existed since the 90's! The reason behind this is quite practical: as technology progressed, humanity have started producing more and more digital documents and the amount of available unlabel data is simply enormous. 
+
+As a result, a lot of self-supervised tasks to learn text representations have been developed in the last few decades to leverage this huge amount of data, such as:
+
+- *center word prediction*, where after defining a window size the model tries to predict the center word in the window given the context words (used in CBOW)
+
+- *masked language modeling*, where words in an input sentence are randomly masked and the model has to predict them (used in BERT, RoBERTa, etc.)
+
+- *next sentence prediction*, where the model has to predict the next sentence given a predecessor (used in BERT)
+
+- *sentence order prediction*, where the model is given a bunch of sentences and it has to order them (used in ALBERT to replace NSP, whose efficacy was questioned)
+
+All of these auxiliary tasks are rather simple but yield very good and meaningful embeddings. But what about **contrastive learning**? 
+
+As it was already mentioned before, contrastive learning originated in the field of Computer Vision, and only recently (after the notable results obtained in other applications) researchers tried to apply contrastive objectives to NLP tasks. However, it's still not very established, but why?
+
+The main problem here is **data augmentation**. Contrary to Computer Vision, were there is a large pool of transformations that can be applied to samples without changing their semantic meaning, in NLP data augmentation is very challenging and preserving the semantic meaning of the sample after a transformation is often a non-trivial task.
+
+Nowadays, the approaches used for data augmentation are mainly:
+
+- **back-translation** (Fang et al. 2019), which consist of translating a word/sentence to another language (e.g. English → Italian) and then translating it back to the original language (e.g. Italian → English); in this case, the augmentation is effectively done by the translator, whose final result often won't be equal to the original sample
+
+- **lexical edits** (Wei and Zhou, 2019), which consists of mainly four different operations on samples: 
+  
+  1. synonym replacement: replace random non-stop words with their synonyms
+  2. random insertion: place a random synonym of a randomly selected non-stop word in the sentence at a random position
+  3. random swap: randomly swap two words
+  4. random deletion: randomly delete each word of the input with probability *p*
+
+- **cutoff** (Shen et al. 2020), which consists in randomly removing information from the input embeddings at token, feature or span level
+
+- **dropout** (Shen et al. 2020), which consists of simply using different network dropout masks to obtain different final embeddings out of the same input 
+
+In particular, dropout was the augmentation tecnique used in a recently proposed framework, SimCSE from Gao et al., that learns dense sentence embeddings. 
+
+### SimCSE
+
+
 
 
 
@@ -221,4 +260,8 @@ In Natural Language Processing
 
 - Yonglong Tian, Dilip Krishnan and Phillip Isola, [Contrastive Multiview Coding](https://doi.org/10.48550/arXiv.1906.05849), 2019
 
-- 
+-  Hongchao Fang, Sicheng Wang, Meng Zhou, Jiayuan Ding and Pengtao Xie, [CERT: Contrastive Self-supervised Learning for Language Understanding](https://arxiv.org/abs/2005.12766), 2020
+
+- Dinghan Shen, Mingzhi Zheng, Yelong Shen, Yanru Qu and Weizhu Chen, [# A Simple but Tough-to-Beat Data Augmentation Approach for Natural Language Understanding and Generation](https://arxiv.org/abs/2009.13818), 2020
+
+- Jason Wei and Kai Zou, [EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks](https://arxiv.org/abs/1901.11196), 2019
