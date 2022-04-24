@@ -6,8 +6,8 @@
 |:-------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
 | [Introduction](#introduction)                                                         | Learning approaches (supervised, unsupervised, self-supervised), definition of Contrastive Learning, general intuition and motivation |
 | [Application examples in CV](#contrastive-learning-in-computer-vision)                | CL in practice: a brief introduction of  CL in Computer Vision and an overview over a influential application (SimCLR)                |
-| [Theoretical understanding of CL](#theoretical-understanding-of-contrastive-learning) | Explaining CL: InfoMax principle and Alignment and Uniformity                                                                         |
-| Applications in NLP                                                                   | Brief contextualization of Contrastive Learning in Natural Language Processing, overview of two applications (SimCSE and DPR)         |
+| [Theoretical understanding of CL](#theoretical-understanding-of-contrastive-learning) | Explaining CL: InfoMax principle, Alignment and Uniformity                                                                            |
+| [Contrastive Learning in NLP](#contrastive-learning-in-nlp)                           | Brief contextualization of Contrastive Learning in Natural Language Processing, overview of two applications (SimCSE and DPR)         |
 
 ## Introduction
 
@@ -31,7 +31,7 @@ However, there exists a middleground between the two, that combines the advanteg
 
 In self-supervised the model is trained on an unlabeled dataset (usually large) using a supervised training task (also called *auxiliary task*). This task is often simple and not very relevant *per se*, but allows us to learn very good representations for the input data, that can be then used in other tasks (usually supervised tasks). The use of these pre-trained embeddings can lead to a strong increase in the performances on the downstream tasks.
 
-<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/bert.png" alt="" width="467" data-align="center">
+<img title="" src="media/bert.png" alt="" width="467" data-align="center">
 
 ### Contrastive Learning
 
@@ -183,7 +183,7 @@ Hence, the contrastive loss clearly optimizes both alignment and uniformity.
 
 In their work, the authors also investigate alignment and uniformity properties empirically to verify their claims. The most notable results that they obtain are
 
-1. alignment and uniformity loss strongly agree with downstream performances, that is more aligned and uniform embeddings achieve better results in downstream tasks, as shown in the illustrations from Wang and Isola<img title="" src="media/downstream.png" alt="loading-ag-817" width="528" data-align="center">
+1. alignment and uniformity loss strongly agree with downstream performances, that is more aligned and uniform embeddings achieve better results in downstream tasks, as shown in the illustrations from Wang and Isola<img title="" src="media/downstream.png" alt="" width="528" data-align="center">
 
 2. alignment and uniformity are meaningful across many different representation learning variants (they experimented with images and text)
 
@@ -194,6 +194,18 @@ In their work, the authors also investigate alignment and uniformity properties 
 4. directly optimizing alignment and uniformity losses at the same time can lead to better results w.r.t. contrastive loss for limited number of negative samples
 
 In general, the results presented in this section are just a gist of the work that has been done so far. If you're interested in the topic, I would definitely suggest to have a look at Wang and Isola paper "Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere" and the other works mentioned so far!
+
+### Anisotropy
+
+In the context of Natural Language Processing, one of the two properties identified by Wang and Isola was related afterwards to another problem that affects language models: anisotropy.
+
+Anisotropy is an issue that was found in representations produced by huge pre-trained language models such as BERT and RoBERTa in some recent works (Ethayarajh 2019; Li et al. 2020). The problem with these embeddings is that they lay in a narrow cone of the vector space, while most of it remains virtually empty (image from Luo 2021).
+
+<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/anisotropy.png" alt="" width="342" data-align="center">
+
+Wang et al. 2020 further show in their work that this problem is related to the drastic decay on the singular values of word embedding matrices in language models.
+
+Intuitively, anisotropy could be correlated to the uniformity metric defined by Wang and Isola, since they're both concerned with the distribution of embeddings in the latent space. Indeed, Gao et al. show in the SimCSE paper that, when
 
 ## Contrastive Learning in NLP
 
@@ -236,9 +248,63 @@ In particular, dropout was the augmentation tecnique used in a recently proposed
 
 ### SimCSE
 
+SimCSE is a simple framework for learning sentence embeddings presented by Gao et al. in 2021. It is based on contrastive learning and uses dropout as data augmentation technique for input sentences. In this paper, the authors:
 
+- propose a self-supervised framework for sentence embedding
 
+- propose a supervised framework for NLI (natural language inference) sentence embedding 
 
+- link the anisotropy problem to uniformity from Wang and Isola (already discussed)
+
+- investigate the quality of the final embeddings
+
+**Self-supervised framework.** The proposed architecture is actually very simple, and quite similar to the examples that we have already presented before for image representation learning. It is based on pre-trained checkpoints of language models like BERT and RoBERTa, that are used to obtain representations of the sentences via the [CLS] token (i.e. a special token that represents the last hidden layer of BERT and can be used for classification tasks at sentence level) which are fine-tuned using a contrastive approach. 
+
+Positive pairs are obtained by passing the same input sentence twice through the transormer using different dropout masks, obtaining in the end two "augmented" representations of the same input sentence. The goal of the model is to maximize the similarity between positive pairs, while minimizing the similarity across different pairs in the same mini-batch.
+
+<img title="" src="media/simcse.png" alt="" data-align="center" width="467">
+
+The loss used to achieve this goal is a specialized formulation of the general contrastive loss, where the representations $h_i$ correspond to the [CLS] token produced by the trained Transformers.
+
+$$
+\ell_i = \log \frac{\exp\left( \text{sim}(h_i^{z_i}, h_i^{z_i'})/\tau \right)}{\sum_{j=1}^N\exp\left( \text{sim}(h_i^{z_i}, h_j^{z_j'})/\tau \right)}
+$$
+
+We will now make a brief detour to cover another setting of contrastive learning that we didn't mentioned so far: **supervised contrastive learning**.
+
+#### [Detour] Supervised contrastive learning
+
+Supervised contrastive learning is a particular setting of contrastive learning, which no longer falls under the self-supervised umbrella but is rather a supervised approach (that is, labels are needed in this case). Supervised contrastive learning was presented by Kholsa et al. in the homonimous paper and basically represents a fully-supervised extension of standard contrastive learning of regular contrastive approaches.
+
+The high-level idea is in this case to take in account, other than just the intrinsic information contained in the sample, other important information that are given us by the label of each sample. 
+
+Comparing this to the unsupervised setting, we can easily see how this translate in practice. While in the unsupervised setting samples with the same semantic meaning (in the context of the specific task) might be spread in the hypersphere and difficult to linearly separate from the other samples, in the supervised setting we incentivate **all** the samples with the same semantic meaning to be pulled together.
+
+<img title="" src="media/supe.png" alt="" data-align="center" width="594">The authors argue that, initializing a network using contrastive learning and then fine-tuning it on the specific task leads to better performances and more robust models than those trained using cross-entropy from scratches. Unfortunately, we don't have too much time to dive deep into this topic, but if you're interested in it I'd recommend a great video from Yannic Kilcher: [Supervised Contrastive Learning](https://www.youtube.com/watch?v=MpdbFLXOOIw).
+
+#### Back to SimCSE
+
+Now that we familiarized a little with supervised contrastive learning, we can have a look at the second framework proposed by Gao et al. in their paper, which is indeed a supervised contrastive approach for sentence embedding. In this case, the model considers triplets $(x_i, x_i^+,x_i^-)$, where $x_i^+$ is an entailed sentence and $x_i^-$ is a contracting sentence (both with respect to the initial sentence $x_i$). 
+
+The positive pairs are obviously defined as $(x_i, x_i^+)$ while the negative samples are chosen to be the other entailed sentences of the batch plus the hard negative $x_i^-$.
+
+The loss is now defined as
+
+$$
+\ell_i= -\log \frac{\exp\left( \text{sim}(h_i, h_i^+)/\tau\right)}{\sum_{j=1}^N\exp\left( \text{sim}(h_i, h_j^+)/\tau\right)+\alpha^{\mathbb{1}_j^i} \exp\left( \text{sim}(h_i, h_i^-)/\tau \right) }
+$$
+
+The goal of the loss is then to pull together entailed representations in the latent space, while pushing away contradicting or unrelated representations.
+
+ Finally, the authors evaluate the quality of the learned embeddings using different metrics. Firstly, they compare the proposed models (supervised and unsupervised SimCSE) to other sentence embedders, using alignment and uniformity metrics. The results are shown in the picture below (from SimCSE paper, Gao et al 2021), and as expected both the models performed very well when evaluated with these metrics and both place the left-below corner of the graph.
+
+<img title="" src="media/res.png" alt="" width="445" data-align="center">
+
+Finally, the authors also evaluate the proposed models on both intrinsic and extrinsic task, achieving state of the art results in most of the selected benchmarks. For the *intrinsic evaluation*, they run experiments on 7 semantic textual similarity tasks, using Spearman’s correlation index (results are reported in the figure above, represented by color). For the *extrinsic evaluation*, they run experiments on 7 transfer tasks (Movie Review, Custom Review, Subjectivity Summarization and others), training a logistic classifier on top of (frozen) sentence embeddings.
+
+As final remark, a cool demo of SimCSE can be found on their Github repo, and a GIF of how SimCSE can be used to evaluate semantic similarities is included below.
+
+<img title="" src="media/demo.gif" alt="" width="496" data-align="center">
 
 
 
@@ -265,3 +331,17 @@ In particular, dropout was the augmentation tecnique used in a recently proposed
 - Dinghan Shen, Mingzhi Zheng, Yelong Shen, Yanru Qu and Weizhu Chen, [# A Simple but Tough-to-Beat Data Augmentation Approach for Natural Language Understanding and Generation](https://arxiv.org/abs/2009.13818), 2020
 
 - Jason Wei and Kai Zou, [EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks](https://arxiv.org/abs/1901.11196), 2019
+
+- Tianyu Gao, Xingcheng Yao and Danqi Chen, [SimCSE: Simple Contrastive Learning of Sentence Embeddings](https://doi.org/10.48550/arXiv.2104.08821), 2021
+
+- Prannay Khosla, Piotr Teterwak, Chen Wang, Aaron Sarna, Yonglong Tian, Phillip Isola, Aaron Maschinot, Ce Liu and Dilip Krishnan, [Supervised Contrastive Learning](https://doi.org/10.48550/arXiv.2004.11362), 2020
+
+- Yannic Kilcher, [Supervised Contrastive Learning](https://www.youtube.com/watch?v=MpdbFLXOOIw)
+
+- Kawin Ethayarajh, [How Contextual are Contextualized Word Representations? Comparing the Geometry of BERT, ELMo, and GPT-2 Embeddings](http://dx.doi.org/10.18653/v1/D19-1006), 2019
+
+- Bohan Li, Hao Zhou, Junxian He, Mingxuan Wang, Yiming Yang, and Lei Li, [On the sentence embeddings from pre-trained language models](https://doi.org/10.48550/arXiv.2011.05864), 2020
+
+- Lingxiao Wang, Jing Huang, Kevin Huang, Ziniu Hu, Guangtao Wang, and Quanquan Gu, [Improving neural language generation with spectrum control](https://openreview.net/pdf?id=ByxY8CNtvr), 2020
+
+- Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen and Wen-tau Yih, [Dense Passage Retrieval for Open-Domain Question Answering](https://doi.org/10.48550/arXiv.2004.04906), 2020
