@@ -103,8 +103,6 @@ These findings are rather interesting, as they allow us to identify in negative 
 
 <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/machine_learning_2x.png" alt="" width="275" data-align="center">
 
----
-
 ## Theoretical Understanding of Contrastive Learning
 
 Enough intuition! It's now time to dive a little more into the teoretical understanding of this particular learning approach. In the last few years, many efforts went into a more formal mathematical explanation of the good results achieved by this particular learning approach.
@@ -139,7 +137,7 @@ However, this bound, as well as the InfoMax interpretation in general, has been 
 
 #### Alignment and Uniformity
 
-A more recent work from Tongzhou Wang and Phillip Isola backed contrastive learning with a new theoretical explanation. In their work, the two authors identify two novel properties and use them to explain the origin of good performances of this framework. These two properties are **alignment** and **uniformity**.
+A more recent work from Tongzhou Wang and Phillip Isola backed contrastive learning with new theoretical insights. In their work, the two authors started from the empirical observation that latent embeddings produced by normalized contrastive losses live in the unit sphere and from there identified two novel properties, **alignment** and **uniformity**.
 
 The first one, alignment, is rather straightforward and is derived directly by the initial intuition behind contrastive learning. It quantifies the noise-invariance property, and is defined as the expected distance between positive pairs. 
 
@@ -162,6 +160,48 @@ $$
 Uniformity in the hypersphere is rather difficult to visualize, but we can try using an illustration inspired from (Wang and Isola, 2020). 
 
 <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/unifor.png" alt="" width="296" data-align="center">
+
+Finally, the authors analyzed the behavior of the contrastive loss in light of the two properties defined above. The result of this analysis are formalized in Theorem 1, where they present the asyntotic behavior of the (normalized) contrastive loss for negative samples which tend to infinite. They show that the loss converges to
+
+$$
+\begin{align*}
+    &\lim\limits_{M\to\infty} \mathcal{L}_{contrastive}(f;\tau,M)-log\,M =\\ 
+     &\qquad\qquad- \frac{1}{\tau} \quad \underset{(x,y)\sim p_{pos}}{\mathbb{E}}[f(x)^\intercal f(y)]\\
+     &\qquad\qquad+\underset{x\sim p_{data}}{\mathbb{E}} \left[ log\, \underset{x^-\sim p_{data}}{\mathbb{E}} [\exp(f(x^-)^\intercal f(x)/\tau)] \right]
+\end{align*}
+$$
+
+where:
+
+- the first term is minimized iff there is perfect alignment
+
+- if a perfectly uniform encoder exists, it is a minimizer for the second term
+
+- for the convergence, the absolute deviation from the limit decays in 𝒪(M−1/2)
+
+Hence, the contrastive loss clearly optimizes both alignment and uniformity.
+
+In their work, the authors also investigate alignment and uniformity properties empirically to verify their claims. The most notable results that they obtain are
+
+1. alignment and uniformity loss strongly agree with downstream performances, that is more aligned and uniform embeddings achieve better results in downstream tasks, as shown in the illustrations from Wang and Isola<img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/downstream.png" alt="" width="528" data-align="center">
+
+2. alignment and uniformity are meaningful across many different representation learning variants (they experimented with images and text)
+
+3. both alignment and uniformity are necessary for good representations; they prove this by defining a new loss as the weighted average between alignement and uniformity losses, and then varying the weight parameter. The result is an U-shaped validation accuracy curved, meaning that the sweet spot is somewhere in the middle, where they are both weighted almost equally 
+   
+   <img title="" src="file:///Users/jake/Desktop/uni/master/seminar/media/ushape.png" alt="" width="410" data-align="center">
+
+4. directly optimizing alignment and uniformity losses at the same time can lead to better results w.r.t. contrastive loss for limited number of negative samples
+
+In general, the results presented in this section are just a gist of the work that has been done so far. If you're interested in the topic, I would definitely suggest to have a look at Wang and Isola paper "Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere" and the other works mentioned so far!
+
+## Contrastive Learning in NLP
+
+In Natural Language Processing 
+
+
+
+
 
 ## References
 
