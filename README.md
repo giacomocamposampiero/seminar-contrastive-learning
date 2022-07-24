@@ -1,4 +1,4 @@
-# Contrastive learning - SiDNN 2022
+# Contrastive Learning - SiDNN 2022
 
 ## Structure of the presentation
 
